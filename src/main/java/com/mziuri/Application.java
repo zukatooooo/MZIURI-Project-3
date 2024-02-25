@@ -1,5 +1,6 @@
 package com.mziuri;
 
+import com.mziuri.service.StorageReaderService;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardContext;
@@ -12,6 +13,9 @@ import java.io.File;
 public class Application {
 
     public static void main(String[] args) throws LifecycleException {
+
+        StorageReaderService storageReaderService = StorageReaderService.instance();
+        storageReaderService.addProductsFromJsonFile("src/main/resources/storage.json");
 
         Tomcat tomcat = new Tomcat();
         tomcat.enableNaming();
