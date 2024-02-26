@@ -28,8 +28,6 @@ public class StorageReaderService {
         return storageReaderServiceObject;
     }
 
-    // TODO: fix addProductsFromJsonFile function.
-
     public void addProductsFromJsonFile(String path) {
         try {
             File jsonFile = new File(path);
@@ -40,17 +38,15 @@ public class StorageReaderService {
             EntityManager entityManager = entityManagerFactory.createEntityManager();
             EntityTransaction transaction = entityManager.getTransaction();
 
-            for (int i = 0; i < storageConfig.getProducts().length; i++){
-                System.out.println(storageConfig.getProducts()[i].toString());
-            }
 
             transaction.begin();
 
-//            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-//            CriteriaQuery<Product> cr = cb.createQuery(Product.class);
-//            Root<Product> root = cr.from(Product.class);
-
-
+            for (int i = 0; i < storageConfig.getProducts().length; i++){
+                System.out.println(storageConfig.getProducts()[i].toString());
+                Product product = new Product(storageConfig.getProducts()[i].getId(),storageConfig.getProducts()[i].getName(), storageConfig.getProducts()[i].getPrice(), storageConfig.getProducts()[i].getAmount());
+                Product managedProduct = entityManager.merge(product);
+                entityManager.persist(managedProduct);
+            }
 
             transaction.commit();
 

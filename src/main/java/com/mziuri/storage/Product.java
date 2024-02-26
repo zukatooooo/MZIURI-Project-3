@@ -11,6 +11,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "prod_id")
     private int id;
 
     @Column(name = "prod_name")
@@ -31,6 +32,22 @@ public class Product {
     }
 
     public Product() {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public int getAmount() {
+        return amount;
     }
 
     @Override
