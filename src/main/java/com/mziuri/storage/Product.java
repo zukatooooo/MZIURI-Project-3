@@ -1,5 +1,8 @@
 package com.mziuri.storage;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
@@ -19,7 +22,8 @@ public class Product {
     @Column(name = "prod_amount")
     private int amount;
 
-    public Product(int id, String name, float price, int amount) {
+    @JsonCreator
+    public Product(@JsonProperty("prod_id") int id, @JsonProperty("prod_name") String name, @JsonProperty("prod_price") float price, @JsonProperty("prod_amount") int amount) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -27,5 +31,15 @@ public class Product {
     }
 
     public Product() {
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", amount=" + amount +
+                '}';
     }
 }

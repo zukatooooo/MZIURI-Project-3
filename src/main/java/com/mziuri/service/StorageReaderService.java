@@ -1,14 +1,18 @@
 package com.mziuri.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mziuri.storage.Product;
+import com.mziuri.storage.StorageConfig;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import org.json.JSONArray;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
-import org.json.JSONObject;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import org.hibernate.Session;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.List;
 
 public class StorageReaderService {
@@ -26,30 +30,34 @@ public class StorageReaderService {
 
     // TODO: fix addProductsFromJsonFile function.
 
-    public void addProductsFromJsonFile(String jsonFilePath) {
-        EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("chemi-unit");
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-
+    public void addProductsFromJsonFile(String path) {
         try {
-            String jsonContent = new String(Files.readAllBytes(Paths.get(jsonFilePath)));
-            JSONArray jsonArray = new JSONArray(jsonContent);
-            entityManager.getTransaction().begin();
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonProduct = jsonArray.getJSONObject(i);
-                int id = jsonProduct.getInt("prod_id");
-                String name = jsonProduct.getString("prod_name");
-                float price = (float) jsonProduct.getDouble("prod_price");
-                int amount = jsonProduct.getInt("prod_amount");
-                Product product = new Product(id, name, price, amount);
-                entityManager.persist(product);
+            File jsonFile = new File(path);
+            ObjectMapper objectMapper = new ObjectMapper();
+            StorageConfig storageConfig = objectMapper.readValue(jsonFile, StorageConfig.class);
+
+            EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("chemi-unit");
+            EntityManager entityManager = entityManagerFactory.createEntityManager();
+            EntityTransaction transaction = entityManager.getTransaction();
+
+            for (int i = 0; i < storageConfig.getProducts().length; i++){
+                System.out.println(storageConfig.getProducts()[i].toString());
             }
-            entityManager.getTransaction().commit();
+
+            transaction.begin();
+
+//            CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+//            CriteriaQuery<Product> cr = cb.createQuery(Product.class);
+//            Root<Product> root = cr.from(Product.class);
+
+
+
+            transaction.commit();
+
+            entityManager.close();
+            entityManagerFactory.close();
+
         } catch (Exception e) {
-            if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback();
-                entityManager.close();
-                entityManagerFactory.close();
-            }
             e.printStackTrace();
         }
     }
